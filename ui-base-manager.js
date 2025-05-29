@@ -4,9 +4,9 @@
  */
 
 import { configManager } from './core-config.js';
-import { EventEmitter } from './core-events.js';
+import { EventBus } from './core-events.js';
 
-export class UIManager extends EventEmitter {
+export class UIManager extends EventBus {
     constructor() {
         super();
         this.currentTheme = 'claude';
