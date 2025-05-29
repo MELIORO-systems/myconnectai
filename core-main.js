@@ -97,17 +97,21 @@ for (const provider of aiProviders) {
     }
 }
         
-        // Check for at least one CRM provider
-        const crmProviders = providerRegistry.getProviders('crm');
-        let hasCRMConfig = false;
-        
-        for (const provider of crmProviders) {
-            const instance = await providerRegistry.getInstance('crm', provider);
-            if (await instance.isConfigured()) {
-                hasCRMConfig = true;
-                break;
-            }
+// Check for at least one CRM provider
+const crmProviders = providerRegistry.getProviders('crm');
+let hasCRMConfig = false;
+
+for (const provider of crmProviders) {
+    try {
+        const instance = await providerRegistry.getInstance('crm', provider);
+        if (await instance.isConfigured()) {
+            hasCRMConfig = true;
+            break;
         }
+    } catch (error) {
+        console.log(`Skipping CRM provider ${provider}: ${error.message}`);
+    }
+}
         
         return hasAIConfig && hasCRMConfig;
     }
