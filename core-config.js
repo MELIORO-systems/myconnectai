@@ -1,321 +1,319 @@
-// Core Configuration - My Connect AI v2.0
-// Pouze základní konfigurace bez vendor specifik
+/**
+ * Core Configuration Manager - My Connect AI v2.0
+ * Manages all configuration loading and access
+ */
 
-const CORE_CONFIG = {
-    // Verze systému
-    VERSION: '2.0.0',
-    ARCHITECTURE: 'modular',
-    
-    // Základní nastavení aplikace
-    APP: {
-        NAME: 'My Connect AI',
-        DESCRIPTION: 'Hybridní AI Connect systém s modulární architekturou',
-        AUTHOR: 'MELIORO Systems',
-        WEBSITE: 'myconnectai.online'
-    },
-    
-    // UI konfigurace
-    UI: {
-        DEFAULT_THEME: 'claude',
-        AVAILABLE_THEMES: ['claude', 'google', 'replit'],
-        MAX_MESSAGE_LENGTH: 2000,
-        AUTO_SAVE_DELAY: 1000,
-        ANIMATION_DURATION: 300
-    },
-    
-    // Zobrazení a limity
-    DISPLAY: {
-        MAX_RECORDS_TO_SHOW: 20,
-        PREVIEW_FIELDS_COUNT: 5,
-        MAX_SEARCH_RESULTS: 50,
-        PAGINATION_SIZE: 10
-    },
-    
-    // Cache nastavení
-    CACHE: {
-        DEFAULT_TTL: 24 * 60 * 60 * 1000, // 24 hodin
-        MAX_CACHE_SIZE: 50 * 1024 * 1024,  // 50 MB
-        CLEANUP_INTERVAL: 60 * 60 * 1000,   // 1 hodina
-        KEYS: {
-            PROVIDERS: 'core_providers_cache',
-            SETTINGS: 'core_settings_cache',
-            THEME: 'core_theme_cache'
-        }
-    },
-    
-    // Bezpečnost
-    SECURITY: {
-        ENCRYPTION_ALGORITHM: 'AES-GCM',
-        KEY_DERIVATION: 'PBKDF2',
-        SALT_LENGTH: 32,
-        IV_LENGTH: 12,
-        TAG_LENGTH: 16,
-        ITERATIONS: 100000
-    },
-    
-    // Validace
-    VALIDATION: {
-        EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        URL_REGEX: /^https?:\/\/.+/,
-        API_KEY_MIN_LENGTH: 20,
-        APP_ID_MIN_LENGTH: 3
-    },
-    
-    // Zprávy a texty
-    MESSAGES: {
-        LOADING: 'Načítám systém...',
-        ERROR_GENERIC: 'Nastala neočekávaná chyba. Zkuste to prosím znovu.',
-        ERROR_NETWORK: 'Problém se síťovým připojením. Zkontrolujte internetové připojení.',
-        ERROR_CONFIG: 'Chyba v konfiguraci. Zkontrolujte nastavení.',
-        SUCCESS_SAVE: 'Nastavení bylo úspěšně uloženo.',
-        CONFIRM_DELETE: 'Opravdu chcete vymazat tato data?',
-        CONFIRM_REFRESH: 'Opravdu chcete obnovit data?'
-    },
-    
-    // Provider typy a kategorie
-    PROVIDERS: {
-        TYPES: {
-            AI: 'ai',
-            CRM: 'crm',
-            STORAGE: 'storage',
-            ANALYTICS: 'analytics'
-        },
-        
-        STATUS: {
-            DISCONNECTED: 'disconnected',
-            CONNECTING: 'connecting',
-            CONNECTED: 'connected',
-            ERROR: 'error',
-            DISABLED: 'disabled'
-        },
-        
-        PRIORITY: {
-            HIGH: 1,
-            MEDIUM: 2,
-            LOW: 3
-        }
-    },
-    
-    // Query processing
-    QUERY: {
-        TYPES: {
-            COUNT: 'count',
-            LIST_ALL: 'list_all',
-            SEARCH_SPECIFIC: 'search_specific',
-            GET_DETAILS: 'get_details',
-            FIND_RELATED: 'find_related',
-            SYSTEM: 'system',
-            GENERAL: 'general'
-        },
-        
-        ENTITIES: {
-            COMPANY: 'company',
-            CONTACT: 'contact',
-            ACTIVITY: 'activity',
-            DEAL: 'deal',
-            PROJECT: 'project',
-            TASK: 'task'
-        },
-        
-        MIN_SEARCH_LENGTH: 2,
-        MAX_RESULTS_PER_TYPE: 10
-    },
-    
-    // Lokalizace
-    LOCALIZATION: {
-        DEFAULT_LANGUAGE: 'cs',
-        SUPPORTED_LANGUAGES: ['cs', 'en'],
-        DATE_FORMAT: 'dd.mm.yyyy',
-        TIME_FORMAT: 'HH:mm',
-        CURRENCY: 'CZK'
-    },
-    
-    // Debug a monitoring
-    DEBUG: {
-        ENABLED: true,
-        LEVEL: 'info', // 'debug', 'info', 'warn', 'error'
-        LOG_PERFORMANCE: true,
-        LOG_API_CALLS: true,
-        LOG_USER_ACTIONS: false
-    },
-    
-    // Feature flags
-    FEATURES: {
-        EXPERIMENTAL_UI: false,
-        ADVANCED_SEARCH: true,
-        OFFLINE_MODE: false,
-        ANALYTICS: false,
-        A_B_TESTING: false
-    },
-    
-    // Performance nastavení
-    PERFORMANCE: {
-        DEBOUNCE_SEARCH: 300,
-        THROTTLE_SCROLL: 100,
-        LAZY_LOAD_THRESHOLD: 200,
-        MAX_CONCURRENT_REQUESTS: 5
-    }
-};
-
-// Utility funkce pro práci s konfigurací
-class CoreConfigManager {
+export class ConfigManager {
     constructor() {
-        this.config = CORE_CONFIG;
-        this.callbacks = new Map();
+        this.configs = {};
+        this.configFiles = [
+            'config-app.json',
+            'config-providers-ai.json',
+            'config-providers-crm.json',
+            'config-example-queries.json'
+        ];
+        this._initialized = false;
     }
-    
-    // Získat hodnotu konfigurace
-    get(path, defaultValue = null) {
-        const keys = path.split('.');
-        let current = this.config;
+
+    /**
+     * Load all configuration files
+     */
+    async loadAll() {
+        if (this._initialized) return;
         
-        for (const key of keys) {
-            if (current && typeof current === 'object' && key in current) {
-                current = current[key];
+        try {
+            console.log('📋 Loading configuration files...');
+            
+            for (const file of this.configFiles) {
+                await this.loadConfig(file);
+            }
+            
+            this._initialized = true;
+            console.log('✅ All configurations loaded');
+            
+        } catch (error) {
+            console.error('❌ Failed to load configurations:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Load a single configuration file
+     * @param {string} filename - Config file name
+     */
+    async loadConfig(filename) {
+        try {
+            const response = await fetch(filename);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const config = await response.json();
+            const configName = filename.replace('config-', '').replace('.json', '');
+            
+            this.configs[configName] = config;
+            console.log(`✅ Loaded ${filename}`);
+            
+        } catch (error) {
+            console.error(`❌ Failed to load ${filename}:`, error);
+            
+            // Use defaults for critical configs
+            if (filename === 'config-app.json') {
+                this.configs.app = this.getDefaultAppConfig();
+                console.warn('Using default app configuration');
+            }
+            
+            throw error;
+        }
+    }
+
+    /**
+     * Get configuration value by path
+     * @param {string} path - Dot notation path (e.g., 'app.name')
+     * @returns {*} Configuration value
+     */
+    get(path) {
+        const parts = path.split('.');
+        let current = this.configs;
+        
+        for (const part of parts) {
+            if (current && typeof current === 'object' && part in current) {
+                current = current[part];
             } else {
-                return defaultValue;
+                return undefined;
             }
         }
         
         return current;
     }
-    
-    // Nastavit hodnotu konfigurace
+
+    /**
+     * Get entire configuration object
+     * @param {string} configName - Configuration name
+     * @returns {Object} Configuration object
+     */
+    getConfig(configName) {
+        return this.configs[configName] || {};
+    }
+
+    /**
+     * Get all configurations
+     * @returns {Object} All configurations
+     */
+    getAll() {
+        return { ...this.configs };
+    }
+
+    /**
+     * Get app configuration
+     * @returns {Object}
+     */
+    getAppConfig() {
+        return this.configs.app || this.getDefaultAppConfig();
+    }
+
+    /**
+     * Get AI providers configuration
+     * @returns {Object}
+     */
+    getAIProvidersConfig() {
+        return this.configs['providers-ai'] || {};
+    }
+
+    /**
+     * Get CRM providers configuration
+     * @returns {Object}
+     */
+    getCRMProvidersConfig() {
+        return this.configs['providers-crm'] || {};
+    }
+
+    /**
+     * Get example queries
+     * @returns {Object}
+     */
+    getExampleQueries() {
+        return this.configs['example-queries'] || this.getDefaultExampleQueries();
+    }
+
+    /**
+     * Get default app configuration
+     * @private
+     */
+    getDefaultAppConfig() {
+        return {
+            app: {
+                name: 'My Connect AI',
+                version: '2.0.0',
+                company: 'MELIORO Systems',
+                website: 'myconnectai.online',
+                tagline: 'Hybridní AI Connect systém'
+            },
+            ui: {
+                defaultTheme: 'claude',
+                display: {
+                    maxRecordsToShow: 20,
+                    previewFieldsCount: 5
+                }
+            }
+        };
+    }
+
+    /**
+     * Get default example queries
+     * @private
+     */
+    getDefaultExampleQueries() {
+        return {
+            categories: {
+                counting: {
+                    name: 'Počítání záznamů',
+                    queries: [
+                        { text: 'Kolik firem je v systému?', icon: '📊' },
+                        { text: 'Kolik kontaktů máme?', icon: '👥' }
+                    ]
+                },
+                listing: {
+                    name: 'Výpisy',
+                    queries: [
+                        { text: 'Vypiš všechny firmy', icon: '📋' },
+                        { text: 'Vypiš obchodní případy', icon: '💼' }
+                    ]
+                }
+            }
+        };
+    }
+
+    /**
+     * Update configuration value (runtime only, not persisted)
+     * @param {string} path - Dot notation path
+     * @param {*} value - New value
+     */
     set(path, value) {
-        const keys = path.split('.');
-        const lastKey = keys.pop();
-        let current = this.config;
+        const parts = path.split('.');
+        const lastPart = parts.pop();
+        let current = this.configs;
         
-        for (const key of keys) {
-            if (!(key in current)) {
-                current[key] = {};
+        for (const part of parts) {
+            if (!(part in current) || typeof current[part] !== 'object') {
+                current[part] = {};
             }
-            current = current[key];
+            current = current[part];
         }
         
-        const oldValue = current[lastKey];
-        current[lastKey] = value;
-        
-        // Spustit callbacks
-        this.notifyChange(path, value, oldValue);
-        
-        return true;
+        current[lastPart] = value;
     }
-    
-    // Registrovat callback pro změny
-    onChange(path, callback) {
-        if (!this.callbacks.has(path)) {
-            this.callbacks.set(path, []);
-        }
-        this.callbacks.get(path).push(callback);
+
+    /**
+     * Check if debug mode is enabled
+     * @returns {boolean}
+     */
+    isDebugMode() {
+        return this.get('app.debug.enabled') || localStorage.getItem('DEBUG_MODE') === 'true';
     }
-    
-    // Notifikovat o změně
-    notifyChange(path, newValue, oldValue) {
-        const callbacks = this.callbacks.get(path) || [];
-        for (const callback of callbacks) {
-            try {
-                callback(newValue, oldValue, path);
-            } catch (error) {
-                console.error('Config callback error:', error);
-            }
-        }
+
+    /**
+     * Get UI text by key
+     * @param {string} key - Message key
+     * @param {Object} params - Parameters for replacement
+     * @returns {string}
+     */
+    getText(key, params = {}) {
+        let text = this.get(`app.ui.messages.${key}`) || key;
+        
+        // Replace parameters
+        Object.entries(params).forEach(([param, value]) => {
+            text = text.replace(`{${param}}`, value);
+        });
+        
+        return text;
     }
-    
-    // Validovat konfiguraci
-    validate() {
-        const errors = [];
+
+    /**
+     * Get theme configuration
+     * @param {string} themeName - Theme name
+     * @returns {Object}
+     */
+    getThemeConfig(themeName) {
+        const themes = this.get('app.ui.availableThemes') || ['claude', 'google', 'replit'];
         
-        // Kontrola povinných hodnot
-        const required = [
-            'APP.NAME',
-            'UI.DEFAULT_THEME',
-            'SECURITY.ENCRYPTION_ALGORITHM'
-        ];
-        
-        for (const path of required) {
-            if (!this.get(path)) {
-                errors.push(`Missing required config: ${path}`);
-            }
-        }
-        
-        // Kontrola validních hodnot
-        const theme = this.get('UI.DEFAULT_THEME');
-        const availableThemes = this.get('UI.AVAILABLE_THEMES', []);
-        if (theme && !availableThemes.includes(theme)) {
-            errors.push(`Invalid default theme: ${theme}`);
+        if (!themes.includes(themeName)) {
+            themeName = this.get('app.ui.defaultTheme') || 'claude';
         }
         
         return {
-            valid: errors.length === 0,
-            errors: errors
+            name: themeName,
+            available: themes
         };
     }
-    
-    // Export konfigurace
-    export() {
-        return JSON.stringify(this.config, null, 2);
+
+    /**
+     * Get provider configuration
+     * @param {string} type - Provider type (ai/crm)
+     * @param {string} name - Provider name
+     * @returns {Object}
+     */
+    getProviderConfig(type, name) {
+        const configKey = type === 'ai' ? 'providers-ai' : 'providers-crm';
+        return this.get(`${configKey}.providers.${name}`) || {};
     }
-    
-    // Import konfigurace
-    import(configJson) {
-        try {
-            const importedConfig = JSON.parse(configJson);
-            
-            // Merge s existující konfigurací
-            this.config = this.deepMerge(this.config, importedConfig);
-            
-            return { success: true };
-        } catch (error) {
-            return { 
-                success: false, 
-                error: `Invalid config format: ${error.message}` 
-            };
-        }
-    }
-    
-    // Deep merge objektů
-    deepMerge(target, source) {
-        const result = { ...target };
+
+    /**
+     * Get all enabled providers
+     * @param {string} type - Provider type (ai/crm)
+     * @returns {Array}
+     */
+    getEnabledProviders(type) {
+        const configKey = type === 'ai' ? 'providers-ai' : 'providers-crm';
+        const providers = this.get(`${configKey}.providers`) || {};
         
-        for (const key in source) {
-            if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                result[key] = this.deepMerge(result[key] || {}, source[key]);
-            } else {
-                result[key] = source[key];
-            }
-        }
-        
-        return result;
+        return Object.entries(providers)
+            .filter(([name, config]) => config.enabled)
+            .map(([name, config]) => ({ name, ...config }));
     }
-    
-    // Reset na výchozí hodnoty
-    reset() {
-        this.config = JSON.parse(JSON.stringify(CORE_CONFIG));
-        console.log('🔄 Configuration reset to defaults');
-    }
-    
-    // Debug info
-    debug() {
-        return {
-            version: this.get('VERSION'),
-            architecture: this.get('ARCHITECTURE'),
-            features: this.get('FEATURES'),
-            providers: this.get('PROVIDERS.TYPES'),
-            valid: this.validate().valid
-        };
+
+    /**
+     * Reload all configurations
+     */
+    async reload() {
+        this.configs = {};
+        this._initialized = false;
+        await this.loadAll();
     }
 }
 
-// Globální instance
-const coreConfig = new CoreConfigManager();
+// Create and export singleton instance
+export const configManager = new ConfigManager();
 
-// Export pro ostatní moduly
-if (typeof window !== 'undefined') {
-    window.CORE_CONFIG = CORE_CONFIG;
-    window.coreConfig = coreConfig;
-} else if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { CORE_CONFIG, CoreConfigManager, coreConfig };
-}
-
-console.log('⚙️ Core Config v2.0 loaded - Modular architecture ready');
+// For backward compatibility with old CONFIG object
+window.CONFIG = new Proxy({}, {
+    get(target, prop) {
+        console.warn(`Accessing CONFIG.${prop} is deprecated. Use configManager.get() instead.`);
+        
+        // Map old CONFIG properties to new config paths
+        const mappings = {
+            TABLES: () => configManager.getCRMProvidersConfig().providers?.tabidoo?.tables || [],
+            EXAMPLE_QUERIES: () => {
+                const queries = configManager.getExampleQueries();
+                const allQueries = [];
+                Object.values(queries.categories || {}).forEach(category => {
+                    allQueries.push(...(category.queries || []));
+                });
+                return allQueries;
+            },
+            API: () => ({
+                OPENAI: configManager.getProviderConfig('ai', 'openai'),
+                TABIDOO: configManager.getProviderConfig('crm', 'tabidoo')
+            }),
+            DISPLAY: () => configManager.get('app.ui.display') || {},
+            MESSAGES: () => configManager.get('app.ui.messages') || {}
+        };
+        
+        if (prop in mappings) {
+            return mappings[prop]();
+        }
+        
+        return undefined;
+    }
+});
