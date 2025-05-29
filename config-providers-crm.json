@@ -1,0 +1,185 @@
+{
+  "providers": {
+    "tabidoo": {
+      "name": "Tabidoo CRM",
+      "enabled": true,
+      "apiBaseUrl": "https://app.tabidoo.cloud/api/v2",
+      "recordsLimit": 100,
+      "cacheHours": 24,
+      "tables": [
+        {
+          "id": "Activities",
+          "name": "Aktivity",
+          "type": "activity",
+          "keywords": ["aktivit", "aktivita", "aktivitou", "aktivity", "úkol", "úkoly", "úkolů", "událost", "události", "událostí"],
+          "primaryField": "name",
+          "searchFields": ["name", "description", "type"],
+          "displayFields": ["name", "type", "date", "owner"]
+        },
+        {
+          "id": "Contacts",
+          "name": "Kontakty",
+          "type": "contact",
+          "keywords": ["kontakt", "kontakty", "kontaktů", "kontaktem", "osoba", "osoby", "osob", "lidí", "lidi", "člověk"],
+          "primaryField": "name",
+          "searchFields": ["name", "jmeno", "prijmeni", "email", "telefon"],
+          "displayFields": ["name", "email", "telefon", "company"]
+        },
+        {
+          "id": "Deals",
+          "name": "Obchodní případy",
+          "type": "deal",
+          "keywords": ["obchod", "obchody", "obchodů", "obchodní", "deal", "dealy", "dealů", "případ", "případy", "případů", "prodej", "prodeje", "nabídka", "nabídky"],
+          "primaryField": "name",
+          "searchFields": ["name", "company", "value"],
+          "displayFields": ["name", "company", "value", "status", "owner"]
+        },
+        {
+          "id": "Customers",
+          "name": "Firmy",
+          "type": "company",
+          "keywords": ["firma", "firmy", "firem", "firmě", "firmou", "společnost", "společnosti", "společností", "podnik", "podniky", "organizace", "klient", "klienti", "zákazník", "zákazníci"],
+          "primaryField": "name",
+          "searchFields": ["name", "nazev", "email", "ico"],
+          "displayFields": ["name", "email", "telefon", "city", "ico"]
+        }
+      ],
+      "fieldMappings": {
+        "name": "Název",
+        "nazev": "Název",
+        "jmeno": "Jméno",
+        "prijmeni": "Příjmení",
+        "email": "E-mail",
+        "telefon": "Telefon",
+        "phone": "Telefon",
+        "company": "Společnost",
+        "firma": "Firma",
+        "status": "Stav",
+        "owner": "Vlastník",
+        "value": "Hodnota",
+        "date": "Datum",
+        "created": "Vytvořeno",
+        "modified": "Upraveno",
+        "description": "Popis",
+        "type": "Typ",
+        "ico": "IČO",
+        "dic": "DIČ",
+        "street": "Ulice",
+        "city": "Město",
+        "zip": "PSČ",
+        "country": "Země"
+      },
+      "apiFeatures": {
+        "pagination": true,
+        "filtering": true,
+        "sorting": true,
+        "includes": true,
+        "webhooks": false
+      },
+      "errorMessages": {
+        "invalidToken": "Neplatný API token. Zkontrolujte nastavení v Tabidoo.",
+        "invalidAppId": "Neplatné App ID. Zkontrolujte název aplikace.",
+        "unauthorized": "Přístup odepřen. Zkontrolujte oprávnění.",
+        "notFound": "Aplikace nebo tabulka nenalezena.",
+        "networkError": "Chyba připojení k Tabidoo API."
+      }
+    },
+    "hubspot": {
+      "name": "HubSpot CRM",
+      "enabled": false,
+      "apiBaseUrl": "https://api.hubapi.com/crm/v3",
+      "comingSoon": true,
+      "description": "Integrace s HubSpot CRM - připravujeme",
+      "requiredScopes": ["crm.objects.contacts.read", "crm.objects.companies.read", "crm.objects.deals.read"],
+      "tables": [
+        {
+          "id": "contacts",
+          "name": "Kontakty",
+          "type": "contact",
+          "endpoint": "/objects/contacts"
+        },
+        {
+          "id": "companies",
+          "name": "Společnosti",
+          "type": "company",
+          "endpoint": "/objects/companies"
+        },
+        {
+          "id": "deals",
+          "name": "Obchody",
+          "type": "deal",
+          "endpoint": "/objects/deals"
+        }
+      ]
+    },
+    "salesforce": {
+      "name": "Salesforce",
+      "enabled": false,
+      "apiBaseUrl": "https://api.salesforce.com",
+      "comingSoon": true,
+      "description": "Integrace se Salesforce - připravujeme",
+      "apiVersion": "v58.0",
+      "tables": [
+        {
+          "id": "Contact",
+          "name": "Kontakty",
+          "type": "contact"
+        },
+        {
+          "id": "Account",
+          "name": "Účty",
+          "type": "company"
+        },
+        {
+          "id": "Opportunity",
+          "name": "Příležitosti",
+          "type": "deal"
+        },
+        {
+          "id": "Task",
+          "name": "Úkoly",
+          "type": "activity"
+        }
+      ]
+    },
+    "pipedrive": {
+      "name": "Pipedrive",
+      "enabled": false,
+      "apiBaseUrl": "https://api.pipedrive.com/v1",
+      "comingSoon": true,
+      "description": "Integrace s Pipedrive - připravujeme"
+    },
+    "zoho": {
+      "name": "Zoho CRM",
+      "enabled": false,
+      "apiBaseUrl": "https://www.zohoapis.com/crm/v2",
+      "comingSoon": true,
+      "description": "Integrace se Zoho CRM - připravujeme"
+    }
+  },
+  "defaults": {
+    "primaryProvider": "tabidoo",
+    "syncInterval": 0,
+    "batchSize": 50,
+    "retryAttempts": 3,
+    "retryDelay": 1000,
+    "timeout": 30000
+  },
+  "dataMapping": {
+    "standardFields": {
+      "id": ["id", "_id", "ID", "recordId"],
+      "name": ["name", "nazev", "title", "jmeno"],
+      "email": ["email", "e-mail", "mail"],
+      "phone": ["phone", "telefon", "tel", "mobile"],
+      "company": ["company", "firma", "organization", "společnost"],
+      "created": ["created", "createdAt", "created_at", "_created"],
+      "modified": ["modified", "updatedAt", "updated_at", "_modified"]
+    },
+    "entityTypes": {
+      "company": ["company", "account", "organization", "firma", "společnost", "klient", "zákazník"],
+      "contact": ["contact", "person", "lead", "kontakt", "osoba"],
+      "deal": ["deal", "opportunity", "order", "obchod", "příležitost", "zakázka"],
+      "activity": ["activity", "task", "event", "aktivita", "úkol", "událost"]
+    }
+  }
+}
