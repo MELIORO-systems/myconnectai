@@ -6,9 +6,10 @@
 import { configManager } from './core-config.js';
 import { securityManager } from './core-security.js';
 import { providerRegistry } from './provider-registry.js';
-import { UIManager } from './ui-manager.js';
+import { UIManager } from './ui-base-manager.js';
 import { QueryProcessor } from './core-query-processor.js';
 import { SetupWizard } from './wizard-setup.js';
+import { EventBus } from './core-events.js';
 
 class Application {
     constructor() {
@@ -116,10 +117,10 @@ class Application {
         this.setupWizard = new SetupWizard();
         await this.setupWizard.start();
         
-        // Listen for wizard completion
-        this.setupWizard.on('complete', async () => {
-            await this.startApplication();
-        });
+    // Listen for wizard completion
+    EventBus.on('wizard-complete', async () => {
+    await this.startApplication();
+    });
     }
 
     /**
