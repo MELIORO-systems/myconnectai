@@ -3,307 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Connect AI | MELIORO Systems</title>
+    <title>My Connect AI | Hybridní AI Connect systém</title>
     
-    <!-- Core Styles -->
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+    
+    <!-- Meta tags -->
+    <meta name="description" content="My Connect AI - Hybridní systém kombinující lokální zpracování dat s AI asistencí">
+    <meta name="author" content="MELIORO Systems">
+    <meta name="keywords" content="AI, CRM, Tabidoo, OpenAI, Gemini, Claude">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="theme-base.css">
     <link rel="stylesheet" href="theme-claude.css">
     <link rel="stylesheet" href="theme-google.css">
     <link rel="stylesheet" href="theme-replit.css">
+    <link rel="stylesheet" href="wizard-setup.css">
     
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://api.openai.com">
+    <link rel="preconnect" href="https://generativelanguage.googleapis.com">
+    <link rel="preconnect" href="https://api.anthropic.com">
+    <link rel="preconnect" href="https://app.tabidoo.cloud">
 </head>
 <body>
     <div class="chat-container">
-        <!-- HLAVIČKA -->
-        <div class="chat-header">
+        <!-- Header -->
+        <header class="chat-header">
             <div class="header-content">
-                <h1><a href="#" onclick="location.reload(); return false;" class="header-logo-link">My Connect AI</a></h1>
-                <div class="header-subtitle">Hybridní AI Connect systém - nová architektura</div>
+                <h1 class="header-title">
+                    <a href="#" onclick="location.reload(); return false;" class="header-logo-link">
+                        My Connect AI
+                    </a>
+                </h1>
+                <div class="header-subtitle">Hybridní AI Connect systém</div>
             </div>
-            <div class="header-buttons">
-                <button class="index-button" onclick="if(window.uiManager) window.uiManager.showWelcomeScreen()" title="Zpět na úvodní stranu">
+            
+            <div class="header-actions">
+                <button class="header-button index-button" onclick="MyConnectAI.app.uiManager.showWelcomeScreen()" title="Zpět na úvodní stranu">
                     Index
                 </button>
+                
                 <div class="dropdown">
-                    <button class="menu-button" onclick="if(window.uiManager) window.uiManager.toggleMainMenu()">
+                    <button class="header-button menu-button" onclick="MyConnectAI.app.uiManager.toggleDropdown('main-menu')">
                         Menu
                     </button>
-                    <div class="dropdown-content" id="mainMenu">
-                        <button class="dropdown-item" onclick="if(window.uiManager) { window.uiManager.showSystemHelp(); window.uiManager.closeMainMenu(); }">
+                    <div class="dropdown-content" id="main-menu">
+                        <button class="dropdown-item" onclick="MyConnectAI.app.uiManager.showHelp('general')">
+                            <span class="dropdown-icon">❓</span>
                             Jak systém funguje
                         </button>
-                        <button class="dropdown-item" onclick="if(window.uiManager) { window.uiManager.showDataProtection(); window.uiManager.closeMainMenu(); }">
+                        <button class="dropdown-item" onclick="MyConnectAI.app.uiManager.showDataProtection()">
+                            <span class="dropdown-icon">🔒</span>
                             Ochrana dat
                         </button>
-                        <button class="dropdown-item" onclick="refreshData(); if(window.uiManager) window.uiManager.closeMainMenu();">
+                        <button class="dropdown-item" onclick="MyConnectAI.app.reload()">
+                            <span class="dropdown-icon">🔄</span>
                             Obnovit data
                         </button>
-                        <button class="dropdown-item" onclick="runDiagnosticsManual(); if(window.uiManager) window.uiManager.closeMainMenu();">
+                        <button class="dropdown-item" onclick="MyConnectAI.app.showDiagnostics()">
+                            <span class="dropdown-icon">🔧</span>
                             Diagnostika
                         </button>
-                        <button class="dropdown-item" onclick="if(window.settingsManager) { window.settingsManager.toggle(); } if(window.uiManager) window.uiManager.closeMainMenu();">
+                        <button class="dropdown-item" onclick="MyConnectAI.app.showSettings()">
+                            <span class="dropdown-icon">⚙️</span>
                             Nastavení
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- NASTAVENÍ PANEL -->
+        </header>
+
+        <!-- Settings Panel -->
         <div id="settings-panel" class="settings-panel" style="display: none;">
-            <div class="settings-title">Nastavení systému</div>
-            
-            <!-- AI PROVIDERY -->
-            <div class="settings-block">
-                <div class="block-title">🤖 AI Providery</div>
-                <div class="block-description">Vyberte a nastavte AI providera pro komunikaci</div>
-                
-                <div class="settings-section">
-                    <label>Aktivní AI Provider</label>
-                    <select id="ai-provider-select" onchange="if(window.settingsManager) window.settingsManager.updateAIProviderDisplay()">
-                        <option value="openai">OpenAI (ChatGPT)</option>
-                        <option value="gemini">Google Gemini</option>
-                        <option value="claude">Anthropic Claude</option>
-                    </select>
-                    <small>Vyberte preferovaný AI model pro komunikaci</small>
-                </div>
-                
-                <!-- OpenAI nastavení -->
-                <div id="openai-provider" class="ai-provider-settings">
-                    <div class="settings-section">
-                        <label for="openai-key">OpenAI API klíč</label>
-                        <div class="input-group">
-                            <input type="password" id="openai-key" placeholder="sk-...">
-                            <button onclick="if(window.uiManager) window.uiManager.toggleVisibility('openai-key')" class="toggle-btn">Zobrazit</button>
-                        </div>
-                        <small>Získejte na <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></small>
-                    </div>
-                </div>
-                
-                <!-- Gemini nastavení -->
-                <div id="gemini-provider" class="ai-provider-settings" style="display: none;">
-                    <div class="settings-section">
-                        <label for="gemini-key">Google Gemini API klíč</label>
-                        <div class="input-group">
-                            <input type="password" id="gemini-key" placeholder="AIza...">
-                            <button onclick="if(window.uiManager) window.uiManager.toggleVisibility('gemini-key')" class="toggle-btn">Zobrazit</button>
-                        </div>
-                        <small>Získejte na <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a></small>
-                    </div>
-                </div>
-                
-                <!-- Claude nastavení -->
-                <div id="claude-provider" class="ai-provider-settings" style="display: none;">
-                    <div class="settings-section">
-                        <label for="claude-key">Anthropic Claude API klíč</label>
-                        <div class="input-group">
-                            <input type="password" id="claude-key" placeholder="sk-ant-...">
-                            <button onclick="if(window.uiManager) window.uiManager.toggleVisibility('claude-key')" class="toggle-btn">Zobrazit</button>
-                        </div>
-                        <small>Získejte na <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a></small>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- CRM PROVIDERY -->
-            <div class="settings-block">
-                <div class="block-title">📊 CRM Providery</div>
-                <div class="block-description">Připojení k vašim CRM systémům</div>
-                
-                <!-- Tabidoo -->
-                <div class="crm-provider">
-                    <div class="crm-provider-header">
-                        <div class="crm-provider-info">
-                            <strong>Tabidoo CRM</strong>
-                            <span class="crm-provider-status" id="tabidoo-status">Nepřipojeno</span>
-                        </div>
-                        <button class="crm-provider-toggle" onclick="if(window.uiManager) window.uiManager.toggleCRMProvider('tabidoo')">Nastavit</button>
-                    </div>
-                    
-                    <div id="tabidoo-provider" class="crm-provider-settings" style="display: none;">
-                        <div class="settings-section">
-                            <label for="tabidoo-app-id">App ID</label>
-                            <input type="text" id="tabidoo-app-id" placeholder="CRM Start">
-                            <small>Název vaší aplikace v Tabidoo</small>
-                        </div>
-                        
-                        <div class="settings-section">
-                            <label for="tabidoo-token">API Token</label>
-                            <div class="input-group">
-                                <input type="password" id="tabidoo-token" placeholder="eyJ...">
-                                <button onclick="if(window.uiManager) window.uiManager.toggleVisibility('tabidoo-token')" class="toggle-btn">Zobrazit</button>
-                            </div>
-                            <small>Najdete v Tabidoo → Nastavení → API</small>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Připraveno pro další CRM -->
-                <div class="crm-provider future-provider">
-                    <div class="crm-provider-header">
-                        <div class="crm-provider-info">
-                            <strong>HubSpot, Salesforce, Pipedrive...</strong>
-                            <span class="crm-provider-status">Připravujeme</span>
-                        </div>
-                        <button class="crm-provider-toggle" disabled>Brzy</button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- OBECNÉ NASTAVENÍ -->
-            <div class="settings-block">
-                <div class="block-title">⚙️ Obecné nastavení</div>
-                <div class="block-description">Vzhled a správa konfigurace</div>
-                
-                <div class="settings-section">
-                    <label>Barevné schéma</label>
-                    <div class="theme-selector">
-                        <div class="theme-option theme-claude active" onclick="if(window.uiManager) window.uiManager.setTheme('claude')" title="Claude (výchozí)"></div>
-                        <div class="theme-option theme-google" onclick="if(window.uiManager) window.uiManager.setTheme('google')" title="Google"></div>
-                        <div class="theme-option theme-replit" onclick="if(window.uiManager) window.uiManager.setTheme('replit')" title="Replit"></div>
-                    </div>
-                    <small>Vyberte barevné schéma rozhraní</small>
-                </div>
-                
-                <div class="settings-section">
-                    <label>Správa konfigurace</label>
-                    <div class="config-actions">
-                        <button onclick="exportConfig()" class="config-btn">
-                            📤 Export konfigurace
-                        </button>
-                        <button onclick="importConfig()" class="config-btn">
-                            📥 Import konfigurace
-                        </button>
-                        <button onclick="if(window.settingsManager) window.settingsManager.clearAllData()" class="config-btn danger">
-                            🗑️ Vymazat vše
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="settings-actions">
-                <button onclick="if(window.settingsManager) window.settingsManager.save()" class="primary-btn">Uložit nastavení</button>
-                <button onclick="if(window.settingsManager) window.settingsManager.close()" class="secondary-btn">Zrušit</button>
-            </div>
-            
-            <div class="security-info">
-                Všechny API klíče jsou šifrovány a ukládány pouze lokálně ve vašem prohlížeči.
-            </div>
+            <!-- Settings content will be dynamically generated -->
         </div>
-        
-        <!-- LOADING INDIKÁTOR -->
-        <div id="loading-status" class="loading-status" style="display: none;">
-            <span id="loading-text">Načítám systém...</span>
+
+        <!-- Progress Bar -->
+        <div id="progress-container" class="progress-container" style="display: none;">
+            <div class="progress-label"></div>
             <div class="progress-bar">
-                <div id="loading-progress" class="progress-fill"></div>
+                <div class="progress-fill"></div>
             </div>
+            <div class="progress-text">0%</div>
         </div>
-        
-        <!-- CHAT OBLAST -->
-        <div id="chat-messages" class="chat-messages">
-            <div class="welcome-container">
-                <div class="example-queries" id="example-queries">
-                    <!-- Příklady budou načteny dynamicky -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- INPUT OBLAST -->
-        <div class="chat-input-area" id="chat-input-area">
-            <textarea id="chat-input" class="chat-input" placeholder="Zeptejte se na cokoliv o vašich datech..." rows="1"></textarea>
-            <button id="send-button" class="send-button" onclick="sendMessage()">
+
+        <!-- Chat Messages -->
+        <main id="chat-messages" class="chat-messages">
+            <!-- Messages will be dynamically added here -->
+        </main>
+
+        <!-- Chat Input -->
+        <div id="chat-input-area" class="chat-input-area">
+            <textarea 
+                id="chat-input" 
+                class="chat-input" 
+                placeholder="Zeptejte se na cokoliv o vašich datech..."
+                rows="1"
+                aria-label="Zadejte váš dotaz"
+            ></textarea>
+            <button 
+                id="send-button" 
+                class="send-button"
+                aria-label="Odeslat zprávu"
+            >
                 Odeslat
             </button>
         </div>
-        
-        <!-- PATIČKA -->
-        <div class="app-footer">
+
+        <!-- Footer -->
+        <footer class="app-footer">
             <div class="footer-content">
-                <span class="footer-text">Powered by <a href="http://melioro.cz" target="_blank" rel="noopener noreferrer" class="footer-link"><strong>MELIORO Systems</strong></a></span>
+                <span class="footer-text">
+                    Powered by 
+                    <a href="http://melioro.cz" target="_blank" rel="noopener noreferrer" class="footer-link">
+                        <strong>MELIORO Systems</strong>
+                    </a>
+                </span>
+                <span class="footer-separator">•</span>
                 <span class="footer-domain">myconnectai.online</span>
-                <span class="footer-version">v2.0 - Modular Architecture</span>
             </div>
-        </div>
+        </footer>
     </div>
 
-    <!-- CORE SYSTEM SCRIPTS -->
-    <script src="core-security.js"></script>
-    <script src="core-config.js"></script>
-    
-    <!-- PROVIDER REGISTRIES -->
-    <script src="registry-providers.js"></script>
-    
-    <!-- AI PROVIDERS -->
-    <script src="ai-base-connector.js"></script>
-    <script src="ai-openai-connector.js"></script>
-    <script src="ai-gemini-connector.js"></script>
-    <script src="ai-claude-connector.js"></script>
-    
-    <!-- CRM PROVIDERS -->
-    <script src="crm-base-connector.js"></script>
-    <script src="crm-tabidoo-connector.js"></script>
-    
-    <!-- CORE FUNCTIONALITY -->
-    <script src="core-query-processor.js"></script>
-    <script src="core-search-engine.js"></script>
-    <script src="core-display.js"></script>
-    
-    <!-- UI MANAGEMENT -->
-    <script src="ui-base-manager.js"></script>
-    <script src="settings-base-manager.js"></script>
-    
-    <!-- MAIN APPLICATION -->
-    <script src="core-main.js"></script>
-    
-    <!-- GLOBAL COMPATIBILITY FUNCTIONS -->
-    <script>
-        // === GLOBAL COMPATIBILITY ===
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <!-- Modal Container -->
+    <div id="modal-container" class="modal-container"></div>
+
+    <!-- Scripts -->
+    <!-- Core system modules -->
+    <script type="module">
+        // Import main application
+        import './core-main.js';
         
-        function refreshData() {
-            if (!confirm('Opravdu chcete znovu načíst data?')) return;
-            if (window.coreSystem) {
-                window.coreSystem.refreshData();
-            } else {
-                location.reload();
+        // Error handling
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+            
+            // Show user-friendly error message
+            if (window.MyConnectAI && window.MyConnectAI.app && window.MyConnectAI.app.uiManager) {
+                window.MyConnectAI.app.uiManager.showError(
+                    'Nastala neočekávaná chyba. Zkuste obnovit stránku.',
+                    event.error
+                );
             }
-        }
+        });
         
-        function runDiagnosticsManual() {
-            if (window.coreSystem) {
-                window.coreSystem.runDiagnostics();
+        // Handle unhandled promise rejections
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
+            
+            // Show user-friendly error message
+            if (window.MyConnectAI && window.MyConnectAI.app && window.MyConnectAI.app.uiManager) {
+                window.MyConnectAI.app.uiManager.showError(
+                    'Nastala chyba při zpracování požadavku.',
+                    event.reason
+                );
             }
-        }
-        
-        function exportConfig() {
-            if (window.settingsManager) {
-                window.settingsManager.exportConfiguration();
-            }
-        }
-        
-        function importConfig() {
-            if (window.settingsManager) {
-                window.settingsManager.importConfiguration();
-            }
-        }
-        
-        function sendMessage() {
-            if (window.coreSystem) {
-                window.coreSystem.processMessage();
-            }
-        }
-        
-        // Debug function
-        window.debugSystem = function() {
-            return {
-                version: '2.0.0-modular',
-                architecture: 'clean-modular',
-                providers: window.providerRegistry ? window.providerRegistry.getStatus() : {},
-                status: 'ready'
-            };
-        };
-        
-        console.log('🚀 My Connect AI v2.0 - Modular Architecture Loading...');
+        });
+    </script>
+
+    <!-- Legacy support for non-module browsers -->
+    <script nomodule>
+        document.getElementById('chat-messages').innerHTML = `
+            <div class="error-message">
+                <h2>Nepodporovaný prohlížeč</h2>
+                <p>Váš prohlížeč nepodporuje moderní JavaScript moduly.</p>
+                <p>Prosím aktualizujte na novější verzi prohlížeče:</p>
+                <ul>
+                    <li>Chrome 61+</li>
+                    <li>Firefox 60+</li>
+                    <li>Safari 11+</li>
+                    <li>Edge 16+</li>
+                </ul>
+            </div>
+        `;
     </script>
 </body>
 </html>
