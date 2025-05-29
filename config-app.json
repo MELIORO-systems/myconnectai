@@ -1,0 +1,107 @@
+{
+  "app": {
+    "name": "My Connect AI",
+    "version": "2.0.0",
+    "company": "MELIORO Systems",
+    "website": "myconnectai.online",
+    "tagline": "Hybridní AI Connect systém",
+    "supportEmail": "support@myconnectai.online",
+    "footer": {
+      "text": "Powered by",
+      "companyName": "MELIORO Systems",
+      "companyLink": "http://melioro.cz"
+    }
+  },
+  "ui": {
+    "defaultTheme": "claude",
+    "availableThemes": ["claude", "google", "replit"],
+    "messages": {
+      "welcome": "Vítejte v My Connect AI",
+      "loading": "Načítám data...",
+      "error": "Nastala chyba při zpracování",
+      "noApiKeys": "Nejprve nastavte API klíče v nastavení",
+      "noResults": "Nenašel jsem žádné záznamy odpovídající \"{query}\"",
+      "connectionError": "Chyba připojení. Zkontrolujte své internetové připojení.",
+      "savingSettings": "Ukládám nastavení...",
+      "settingsSaved": "Nastavení bylo úspěšně uloženo!",
+      "settingsError": "Chyba při ukládání nastavení"
+    },
+    "display": {
+      "maxRecordsToShow": 20,
+      "previewFieldsCount": 5,
+      "animationDuration": 300,
+      "scrollBehavior": "smooth",
+      "dateFormat": "DD.MM.YYYY",
+      "timeFormat": "HH:mm",
+      "numberFormat": "cs-CZ"
+    },
+    "buttons": {
+      "send": "Odeslat",
+      "cancel": "Zrušit",
+      "save": "Uložit",
+      "delete": "Smazat",
+      "edit": "Upravit",
+      "close": "Zavřít",
+      "back": "Zpět",
+      "next": "Další",
+      "finish": "Dokončit",
+      "refresh": "Obnovit",
+      "showMore": "Zobrazit více",
+      "showLess": "Zobrazit méně"
+    }
+  },
+  "cache": {
+    "enabled": true,
+    "dataExpirationHours": 24,
+    "keyPrefix": "myconnectai_cache_",
+    "maxCacheSize": 10485760,
+    "compressionEnabled": false
+  },
+  "search": {
+    "minSearchLength": 2,
+    "fuzzySearchThreshold": 0.6,
+    "maxSearchResults": 50,
+    "highlightMatches": true,
+    "searchDelay": 300,
+    "includePartialMatches": true,
+    "caseSensitive": false
+  },
+  "performance": {
+    "lazyLoadImages": true,
+    "virtualScrolling": true,
+    "debounceDelay": 300,
+    "throttleDelay": 100,
+    "maxConcurrentRequests": 3
+  },
+  "debug": {
+    "enabled": false,
+    "logLevel": "info",
+    "showTimestamps": true,
+    "logApiCalls": true,
+    "logPerformance": false,
+    "preserveLogs": false
+  },
+  "features": {
+    "multiLanguage": false,
+    "darkMode": true,
+    "exportData": true,
+    "importData": true,
+    "offlineMode": false,
+    "notifications": true,
+    "autoSave": true,
+    "keyboardShortcuts": true
+  },
+  "security": {
+    "encryptionEnabled": true,
+    "sessionTimeout": 0,
+    "requireHttps": false,
+    "csrfProtection": false,
+    "sanitizeInput": true
+  },
+  "analytics": {
+    "enabled": false,
+    "trackErrors": true,
+    "trackPerformance": false,
+    "anonymizeData": true
+  }
+}
