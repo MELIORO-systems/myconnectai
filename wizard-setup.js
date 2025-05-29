@@ -1,6 +1,6 @@
 /**
  * Setup Wizard - My Connect AI v2.0
- * First-time setup wizard for new users
+ * First-time setup wizard for new users 
  */
 
 import { EventBus } from './core-events.js';
