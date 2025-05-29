@@ -8,7 +8,6 @@ import { EventBus } from './core-events.js';
 
 export class UIManager {
     constructor() {
-        super();
         this.currentTheme = 'claude';
         this.messageContainer = null;
         this.inputElement = null;
