@@ -1,97 +1,307 @@
-// Core Security Manager - My Connect AI v2.0
-// Vylepšené zabezpečení pro modulární architekturu
+/**
+ * Core Security Manager - My Connect AI v2.0
+ * Handles encryption, decryption, and secure storage of sensitive data
+ */
 
-class CoreSecurityManager {
+export class SecurityManager {
     constructor() {
-        this.deviceKey = this.getOrCreateDeviceKey();
-        this.sessionKey = this.generateSessionKey();
-        this.encryptionCache = new Map();
-        
-        // Namespace pro různé typy dat
-        this.namespaces = {
-            AI_KEYS: 'ai_keys',
-            CRM_KEYS: 'crm_keys',
-            USER_SETTINGS: 'user_settings',
-            PROVIDER_CONFIG: 'provider_config',
-            CACHE_DATA: 'cache_data'
-        };
-        
-        console.log('🔐 Core Security Manager v2.0 initialized');
+        this.algorithm = 'AES-GCM';
+        this.keyLength = 256;
+        this.saltLength = 16;
+        this.ivLength = 12;
+        this.tagLength = 128;
+        this.iterations = 100000;
+        this._initialized = false;
     }
-    
-    // === DEVICE KEY MANAGEMENT ===
-    
-    getOrCreateDeviceKey() {
-        let key = localStorage.getItem('core_device_key');
-        if (!key) {
-            key = this.generateSecureKey(64);
-            localStorage.setItem('core_device_key', key);
-            console.log('🔑 New device key generated');
-        }
-        return key;
-    }
-    
-    generateSecureKey(length = 32) {
-        const array = new Uint8Array(length);
-        crypto.getRandomValues(array);
-        return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
-    }
-    
-    generateSessionKey() {
-        return this.generateSecureKey(32);
-    }
-    
-    // === ENHANCED ENCRYPTION ===
-    
-    encrypt(text, namespace = 'default', useSessionKey = false) {
-        if (!text) return '';
+
+    /**
+     * Initialize the security manager
+     */
+    async init() {
+        if (this._initialized) return;
         
         try {
-            const key = useSessionKey ? this.sessionKey : this.deviceKey;
-            const keyWithNamespace = this.deriveNamespaceKey(key, namespace);
-            
-            // XOR šifrování s vylepšením
-            let result = '';
-            const salt = this.generateSecureKey(8);
-            
-            for (let i = 0; i < text.length; i++) {
-                const keyChar = keyWithNamespace.charCodeAt((i + salt.length) % keyWithNamespace.length);
-                const saltChar = salt.charCodeAt(i % salt.length);
-                result += String.fromCharCode(
-                    text.charCodeAt(i) ^ keyChar ^ saltChar
-                );
+            // Test if Web Crypto API is available
+            if (!window.crypto || !window.crypto.subtle) {
+                throw new Error('Web Crypto API not available');
             }
             
-            // Přidat salt na začátek
-            const encrypted = salt + result;
-            const encoded = btoa(encrypted);
+            // Initialize or verify master key
+            await this._getOrCreateMasterKey();
+            this._initialized = true;
             
-            // Cache pro performance
-            this.encryptionCache.set(this.hashString(text + namespace), encoded);
-            
-            return encoded;
+            console.log('✅ Security Manager initialized');
         } catch (error) {
-            console.error('Encryption error:', error);
-            return '';
+            console.error('❌ Security Manager initialization failed:', error);
+            throw error;
         }
     }
-    
-    decrypt(encoded, namespace = 'default', useSessionKey = false) {
-        if (!encoded) return '';
+
+    /**
+     * Get or create the master encryption key
+     * @private
+     */
+    async _getOrCreateMasterKey() {
+        const storedKey = localStorage.getItem('myconnectai_mk');
+        
+        if (storedKey) {
+            // Verify stored key is valid
+            try {
+                await this._importKey(storedKey);
+                return;
+            } catch (error) {
+                console.warn('Stored master key invalid, creating new one');
+                localStorage.removeItem('myconnectai_mk');
+            }
+        }
+        
+        // Generate new master key
+        const key = await crypto.subtle.generateKey(
+            {
+                name: this.algorithm,
+                length: this.keyLength
+            },
+            true,
+            ['encrypt', 'decrypt']
+        );
+        
+        const exportedKey = await crypto.subtle.exportKey('jwk', key);
+        localStorage.setItem('myconnectai_mk', JSON.stringify(exportedKey));
+    }
+
+    /**
+     * Import a key from JWK format
+     * @private
+     */
+    async _importKey(keyData) {
+        const jwk = typeof keyData === 'string' ? JSON.parse(keyData) : keyData;
+        
+        return await crypto.subtle.importKey(
+            'jwk',
+            jwk,
+            {
+                name: this.algorithm,
+                length: this.keyLength
+            },
+            true,
+            ['encrypt', 'decrypt']
+        );
+    }
+
+    /**
+     * Encrypt sensitive data
+     * @param {string} data - Data to encrypt
+     * @returns {Promise<string>} Encrypted data as base64 string
+     */
+    async encrypt(data) {
+        if (!this._initialized) await this.init();
         
         try {
-            const key = useSessionKey ? this.sessionKey : this.deviceKey;
-            const keyWithNamespace = this.deriveNamespaceKey(key, namespace);
+            const key = await this._importKey(localStorage.getItem('myconnectai_mk'));
+            const iv = crypto.getRandomValues(new Uint8Array(this.ivLength));
+            const encodedData = new TextEncoder().encode(data);
             
-            const encrypted = atob(encoded);
+            const encryptedData = await crypto.subtle.encrypt(
+                {
+                    name: this.algorithm,
+                    iv: iv,
+                    tagLength: this.tagLength
+                },
+                key,
+                encodedData
+            );
             
-            if (encrypted.length < 8) return '';
+            // Combine IV and encrypted data
+            const combined = new Uint8Array(iv.length + encryptedData.byteLength);
+            combined.set(iv);
+            combined.set(new Uint8Array(encryptedData), iv.length);
             
-            const salt = encrypted.substring(0, 8);
-            const ciphertext = encrypted.substring(8);
+            // Convert to base64 for storage
+            return btoa(String.fromCharCode.apply(null, combined));
+        } catch (error) {
+            console.error('Encryption failed:', error);
+            throw new Error('Failed to encrypt data');
+        }
+    }
+
+    /**
+     * Decrypt sensitive data
+     * @param {string} encryptedData - Base64 encrypted data
+     * @returns {Promise<string>} Decrypted data
+     */
+    async decrypt(encryptedData) {
+        if (!this._initialized) await this.init();
+        
+        try {
+            const key = await this._importKey(localStorage.getItem('myconnectai_mk'));
             
-            let result = '';
-            for (let i = 0; i < ciphertext.length; i++) {
-                const keyChar = keyWithNamespace.charCodeAt((i + salt.length) % keyWithNamespace.length);
-                const saltChar = salt.charCodeAt(i % salt.length);
-                result += String
+            // Convert from base64
+            const combined = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
+            
+            // Extract IV and encrypted data
+            const iv = combined.slice(0, this.ivLength);
+            const data = combined.slice(this.ivLength);
+            
+            const decryptedData = await crypto.subtle.decrypt(
+                {
+                    name: this.algorithm,
+                    iv: iv,
+                    tagLength: this.tagLength
+                },
+                key,
+                data
+            );
+            
+            return new TextDecoder().decode(decryptedData);
+        } catch (error) {
+            console.error('Decryption failed:', error);
+            throw new Error('Failed to decrypt data');
+        }
+    }
+
+    /**
+     * Save encrypted data to localStorage
+     * @param {string} key - Storage key
+     * @param {string} value - Value to encrypt and store
+     */
+    async saveSecure(key, value) {
+        if (!value) {
+            localStorage.removeItem(`secure_${key}`);
+            return;
+        }
+        
+        const encrypted = await this.encrypt(value);
+        localStorage.setItem(`secure_${key}`, encrypted);
+    }
+
+    /**
+     * Load and decrypt data from localStorage
+     * @param {string} key - Storage key
+     * @returns {Promise<string|null>} Decrypted value or null
+     */
+    async loadSecure(key) {
+        const encrypted = localStorage.getItem(`secure_${key}`);
+        if (!encrypted) return null;
+        
+        try {
+            return await this.decrypt(encrypted);
+        } catch (error) {
+            console.warn(`Failed to decrypt ${key}, removing corrupted data`);
+            localStorage.removeItem(`secure_${key}`);
+            return null;
+        }
+    }
+
+    /**
+     * Check if secure key exists
+     * @param {string} key - Storage key
+     * @returns {boolean}
+     */
+    hasSecureKey(key) {
+        return localStorage.getItem(`secure_${key}`) !== null;
+    }
+
+    /**
+     * Remove secure data
+     * @param {string} key - Storage key
+     */
+    removeSecure(key) {
+        localStorage.removeItem(`secure_${key}`);
+    }
+
+    /**
+     * Clear all secure data
+     * @param {boolean} includeMasterKey - Also remove master key
+     */
+    clearAllSecure(includeMasterKey = false) {
+        const keys = Object.keys(localStorage);
+        
+        keys.forEach(key => {
+            if (key.startsWith('secure_')) {
+                localStorage.removeItem(key);
+            }
+        });
+        
+        if (includeMasterKey) {
+            localStorage.removeItem('myconnectai_mk');
+            this._initialized = false;
+        }
+        
+        console.log('🗑️ All secure data cleared');
+    }
+
+    /**
+     * Export all secure keys (for backup)
+     * @returns {Promise<Object>} Encrypted backup data
+     */
+    async exportSecureData() {
+        const backup = {
+            version: '2.0.0',
+            timestamp: new Date().toISOString(),
+            data: {}
+        };
+        
+        const keys = Object.keys(localStorage);
+        
+        for (const key of keys) {
+            if (key.startsWith('secure_')) {
+                backup.data[key] = localStorage.getItem(key);
+            }
+        }
+        
+        return backup;
+    }
+
+    /**
+     * Import secure data from backup
+     * @param {Object} backup - Backup data
+     */
+    async importSecureData(backup) {
+        if (backup.version !== '2.0.0') {
+            throw new Error('Incompatible backup version');
+        }
+        
+        for (const [key, value] of Object.entries(backup.data)) {
+            localStorage.setItem(key, value);
+        }
+        
+        console.log('✅ Secure data imported successfully');
+    }
+
+    /**
+     * Generate a random password
+     * @param {number} length - Password length
+     * @returns {string} Random password
+     */
+    generateRandomPassword(length = 32) {
+        const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+        const randomValues = crypto.getRandomValues(new Uint8Array(length));
+        
+        return Array.from(randomValues)
+            .map(byte => charset[byte % charset.length])
+            .join('');
+    }
+
+    /**
+     * Hash a value (for non-reversible storage)
+     * @param {string} value - Value to hash
+     * @returns {Promise<string>} Hashed value
+     */
+    async hash(value) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(value);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+}
+
+// Create and export singleton instance
+export const securityManager = new SecurityManager();
+
+// For backward compatibility
+window.security = {
+    saveSecure: (key, value) => securityManager.saveSecure(key, value),
+    loadSecure: (key) => securityManager.loadSecure(key),
+    clearSecure: () => securityManager.clearAllSecure()
+};
