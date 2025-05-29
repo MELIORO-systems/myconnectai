@@ -1,0 +1,116 @@
+{
+  "providers": {
+    "openai": {
+      "name": "OpenAI (ChatGPT)",
+      "enabled": true,
+      "apiUrl": "https://api.openai.com/v1/chat/completions",
+      "model": "gpt-3.5-turbo",
+      "maxTokens": 1000,
+      "temperature": 0.3,
+      "topP": 1,
+      "frequencyPenalty": 0,
+      "presencePenalty": 0,
+      "apiKeyPrefix": "sk-",
+      "getApiKeyUrl": "https://platform.openai.com/api-keys",
+      "prompts": {
+        "system": "Jsi asistent pro My Connect AI CRM systém. Zformuluj odpověď na základě poskytnutých dat. Buď přesný a strukturovaný. Odpovídej česky. Používej přátelský, ale profesionální tón.",
+        "templates": {
+          "default": "Uživatel se zeptal: \"{query}\"\n\nKontext: {context}",
+          "detailFormat": "Uživatel se zeptal: \"{query}\"\n\nNašel jsem tyto detailní údaje:\n{data}\n\nProsím zformuluj přehlednou odpověď s těmito informacemi.",
+          "relatedFormat": "Uživatel se zeptal: \"{query}\"\n\nHlavní záznam:\n{mainRecord}\n\nSouvisející data:\n{relatedData}\n\nVytvoř strukturovanou odpověď, která přehledně zobrazí hlavní informace a jejich souvislosti.",
+          "searchFormat": "Uživatel se zeptal: \"{query}\"\n\nNašel jsem tyto relevantní záznamy:\n{results}\n\nShrň výsledky vyhledávání do přehledné odpovědi.",
+          "countFormat": "Uživatel se zeptal: \"{query}\"\n\nStatistika: {data}\n\nOdpověz na dotaz ohledně počtu záznamů.",
+          "listFormat": "Uživatel se zeptal: \"{query}\"\n\nSeznam záznamů:\n{data}\n\nVytvoř přehledný výpis s nejdůležitějšími informacemi o každém záznamu."
+        }
+      },
+      "errorMessages": {
+        "invalidKey": "Neplatný API klíč. Zkontrolujte, zda klíč začíná na 'sk-'.",
+        "rateLimited": "Překročen limit požadavků. Zkuste to prosím za chvíli.",
+        "networkError": "Chyba připojení k OpenAI API.",
+        "invalidResponse": "Neplatná odpověď z API."
+      }
+    },
+    "gemini": {
+      "name": "Google Gemini",
+      "enabled": true,
+      "apiUrl": "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent",
+      "model": "gemini-pro",
+      "maxTokens": 1000,
+      "temperature": 0.3,
+      "topK": 40,
+      "topP": 0.95,
+      "apiKeyPrefix": "AIza",
+      "getApiKeyUrl": "https://aistudio.google.com/app/apikey",
+      "prompts": {
+        "system": "Jsi asistent pro My Connect AI CRM systém. Odpovídej česky, buď přesný a strukturovaný. Používej přátelský, ale profesionální tón.",
+        "templates": {
+          "default": "Kontext CRM systému:\n{context}\n\nOtázka uživatele: {query}\n\nOdpověz na základě poskytnutých dat.",
+          "detailFormat": "Detailní informace o záznamu:\n{data}\n\nOtázka: {query}\n\nVytvoř přehlednou odpověď s těmito informacemi.",
+          "relatedFormat": "Hlavní data:\n{mainRecord}\n\nSouvisející záznamy:\n{relatedData}\n\nOtázka: {query}\n\nVysvětli souvislosti mezi daty.",
+          "searchFormat": "Výsledky vyhledávání:\n{results}\n\nDotaz: {query}\n\nShrň nalezené výsledky.",
+          "countFormat": "Statistické údaje:\n{data}\n\nDotaz: {query}\n\nOdpověz na dotaz o počtech.",
+          "listFormat": "Seznam dat:\n{data}\n\nDotaz: {query}\n\nVytvoř přehledný seznam."
+        }
+      },
+      "errorMessages": {
+        "invalidKey": "Neplatný API klíč. Zkontrolujte, zda klíč začíná na 'AIza'.",
+        "quotaExceeded": "Překročena kvóta API. Zkontrolujte svůj účet.",
+        "networkError": "Chyba připojení ke Google API.",
+        "invalidResponse": "Neplatná odpověď z API."
+      }
+    },
+    "claude": {
+      "name": "Anthropic Claude",
+      "enabled": true,
+      "apiUrl": "https://api.anthropic.com/v1/messages",
+      "model": "claude-3-haiku-20240307",
+      "maxTokens": 1000,
+      "temperature": 0.3,
+      "apiKeyPrefix": "sk-ant-",
+      "getApiKeyUrl": "https://console.anthropic.com/",
+      "anthropicVersion": "2023-06-01",
+      "prompts": {
+        "system": "Jsi asistent pro My Connect AI CRM systém. Formuluj přesné a strukturované odpovědi v češtině. Zaměř se na praktičnost a užitečnost informací pro uživatele CRM systému.",
+        "templates": {
+          "default": "CRM Kontext:\n{context}\n\nUživatelský dotaz: {query}\n\nPoskytni relevantní odpověď založenou na datech.",
+          "detailFormat": "Detailní záznam CRM:\n{data}\n\nDotaz: {query}\n\nPrezentuj informace strukturovaně a srozumitelně.",
+          "relatedFormat": "Primární záznam:\n{mainRecord}\n\nPropojené záznamy:\n{relatedData}\n\nDotaz: {query}\n\nVysvětli vztahy mezi záznamy.",
+          "searchFormat": "Nalezené záznamy:\n{results}\n\nHledaný výraz: {query}\n\nSumarizuj výsledky vyhledávání.",
+          "countFormat": "Statistika CRM:\n{data}\n\nDotaz: {query}\n\nUveď přesné počty a jejich kontext.",
+          "listFormat": "Výpis záznamů:\n{data}\n\nPožadavek: {query}\n\nVytvoř strukturovaný přehled."
+        }
+      },
+      "errorMessages": {
+        "invalidKey": "Neplatný API klíč. Zkontrolujte, zda klíč začíná na 'sk-ant-'.",
+        "rateLimited": "Překročen limit požadavků Claude API.",
+        "networkError": "Chyba připojení k Anthropic API.",
+        "invalidResponse": "Neplatná odpověď z API."
+      }
+    }
+  },
+  "defaults": {
+    "selectedProvider": "openai",
+    "fallbackProvider": "openai",
+    "retryAttempts": 3,
+    "retryDelay": 1000,
+    "timeout": 30000,
+    "cacheResponses": false,
+    "logTokenUsage": true
+  },
+  "shared": {
+    "responseInstructions": [
+      "Vždy odpovídej v češtině",
+      "Používej strukturované formátování (odrážky, číslování)",
+      "Buď stručný, ale úplný",
+      "Vyvaruj se technickému žargonu",
+      "Pokud něco nevíš, řekni to"
+    ],
+    "formatting": {
+      "useMarkdown": true,
+      "useBold": true,
+      "useItalics": false,
+      "useCodeBlocks": false,
+      "maxLineLength": 80
+    }
+  }
+}
