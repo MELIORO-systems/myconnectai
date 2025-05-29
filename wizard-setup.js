@@ -3,12 +3,12 @@
  * First-time setup wizard for new users
  */
 
-import { EventEmitter } from './ui-manager.js';
+import { EventBus } from './core-events.js';
 import { configManager } from './core-config.js';
 import { securityManager } from './core-security.js';
 import { providerRegistry } from './provider-registry.js';
 
-export class SetupWizard extends EventEmitter {
+export class SetupWizard {
     constructor() {
         super();
         this.currentStep = 0;
@@ -741,7 +741,7 @@ export class SetupWizard extends EventEmitter {
         localStorage.setItem('wizardCompleted', 'true');
         
         // Emit completion event
-        this.emit('complete');
+        EventBus.emit('wizard-complete', { wizard: this });
         
         // Remove wizard container
         if (this.container) {
