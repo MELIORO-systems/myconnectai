@@ -85,13 +85,17 @@ class Application {
         const aiProviders = providerRegistry.getProviders('ai');
         let hasAIConfig = false;
         
-        for (const provider of aiProviders) {
-            const instance = await providerRegistry.getInstance('ai', provider);
-            if (await instance.isConfigured()) {
-                hasAIConfig = true;
-                break;
-            }
+for (const provider of aiProviders) {
+    try {
+        const instance = await providerRegistry.getInstance('ai', provider);
+        if (await instance.isConfigured()) {
+            hasAIConfig = true;
+            break;
         }
+    } catch (error) {
+        console.log(`Skipping AI provider ${provider}: ${error.message}`);
+    }
+}
         
         // Check for at least one CRM provider
         const crmProviders = providerRegistry.getProviders('crm');
