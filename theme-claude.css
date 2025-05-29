@@ -1,0 +1,19 @@
+/**
+ * Claude Theme - My Connect AI v2.0
+ * Default theme inspired by Claude.ai interface
+ */
+
+/* Claude theme is the default - no additional styling needed */
+/* All Claude colors are already defined in theme-base.css as defaults */
+
+/* This file is intentionally minimal as Claude is the default theme */
+/* The :root variables in theme-base.css define the Claude color scheme */
+
+/* 
+ * Color palette reference (already in theme-base.css):
+ * Primary: #C96442 (warm orange)
+ * Background: #FAF9F5 (warm off-white)
+ * Surface: #F0EEE6 (light warm gray)
+ * Border: #E2DFD7 (warm gray)
+ * Text: #2D2A26 (dark warm gray)
+ */
