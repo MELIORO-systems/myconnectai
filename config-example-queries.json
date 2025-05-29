@@ -1,0 +1,211 @@
+{
+  "categories": {
+    "counting": {
+      "name": "Počítání záznamů",
+      "description": "Zjistěte kolik máte dat v systému",
+      "queries": [
+        {
+          "text": "Kolik firem je v systému?",
+          "icon": "📊",
+          "tags": ["počet", "firmy", "statistika"],
+          "expectedType": "count",
+          "entity": "company"
+        },
+        {
+          "text": "Kolik kontaktů máme?",
+          "icon": "👥",
+          "tags": ["počet", "kontakty", "statistika"],
+          "expectedType": "count",
+          "entity": "contact"
+        },
+        {
+          "text": "Kolik aktivit proběhlo?",
+          "icon": "📈",
+          "tags": ["počet", "aktivity", "statistika"],
+          "expectedType": "count",
+          "entity": "activity"
+        },
+        {
+          "text": "Jaký je počet obchodních případů?",
+          "icon": "💰",
+          "tags": ["počet", "obchody", "statistika"],
+          "expectedType": "count",
+          "entity": "deal"
+        }
+      ]
+    },
+    "listing": {
+      "name": "Výpisy dat",
+      "description": "Zobrazte seznamy vašich záznamů",
+      "queries": [
+        {
+          "text": "Vypiš všechny firmy",
+          "icon": "📋",
+          "tags": ["výpis", "seznam", "firmy"],
+          "expectedType": "list",
+          "entity": "company"
+        },
+        {
+          "text": "Zobraz seznam kontaktů",
+          "icon": "📇",
+          "tags": ["výpis", "seznam", "kontakty"],
+          "expectedType": "list",
+          "entity": "contact"
+        },
+        {
+          "text": "Vypiš obchodní případy",
+          "icon": "💼",
+          "tags": ["výpis", "seznam", "obchody"],
+          "expectedType": "list",
+          "entity": "deal"
+        },
+        {
+          "text": "Ukaž mi všechny aktivity",
+          "icon": "📅",
+          "tags": ["výpis", "seznam", "aktivity"],
+          "expectedType": "list",
+          "entity": "activity"
+        }
+      ]
+    },
+    "searching": {
+      "name": "Vyhledávání",
+      "description": "Najděte konkrétní záznamy",
+      "queries": [
+        {
+          "text": "Najdi firmu Alza",
+          "icon": "🔍",
+          "tags": ["hledání", "firma", "konkrétní"],
+          "expectedType": "search",
+          "entity": "company",
+          "example": true
+        },
+        {
+          "text": "Vyhledej kontakt Jan Novák",
+          "icon": "🔎",
+          "tags": ["hledání", "kontakt", "konkrétní"],
+          "expectedType": "search",
+          "entity": "contact",
+          "example": true
+        },
+        {
+          "text": "Najdi obchod s hodnotou nad 100 000",
+          "icon": "💎",
+          "tags": ["hledání", "obchod", "filtr"],
+          "expectedType": "search",
+          "entity": "deal",
+          "advanced": true
+        }
+      ]
+    },
+    "relationships": {
+      "name": "Související data",
+      "description": "Zobrazení propojených informací",
+      "queries": [
+        {
+          "text": "Jaké kontakty má firma Alza?",
+          "icon": "🔗",
+          "tags": ["vztahy", "kontakty", "firma"],
+          "expectedType": "related",
+          "entity": "company",
+          "relatedEntity": "contact",
+          "example": true
+        },
+        {
+          "text": "Zobraz aktivity firmy Microsoft",
+          "icon": "📊",
+          "tags": ["vztahy", "aktivity", "firma"],
+          "expectedType": "related",
+          "entity": "company",
+          "relatedEntity": "activity",
+          "example": true
+        },
+        {
+          "text": "Jaké obchody má kontakt Pavel Černý?",
+          "icon": "💰",
+          "tags": ["vztahy", "obchody", "kontakt"],
+          "expectedType": "related",
+          "entity": "contact",
+          "relatedEntity": "deal",
+          "example": true
+        }
+      ]
+    },
+    "analysis": {
+      "name": "Analýzy a reporty",
+      "description": "Získejte přehledy o vašich datech",
+      "queries": [
+        {
+          "text": "Shrň mi dnešní aktivity",
+          "icon": "📅",
+          "tags": ["analýza", "shrnutí", "aktivity"],
+          "expectedType": "analysis",
+          "timeframe": "today"
+        },
+        {
+          "text": "Které firmy nemají žádné kontakty?",
+          "icon": "⚠️",
+          "tags": ["analýza", "firmy", "kontakty"],
+          "expectedType": "analysis",
+          "advanced": true
+        },
+        {
+          "text": "Top 10 největších obchodů",
+          "icon": "🏆",
+          "tags": ["analýza", "obchody", "žebříček"],
+          "expectedType": "analysis",
+          "advanced": true
+        }
+      ]
+    },
+    "system": {
+      "name": "Systémové dotazy",
+      "description": "Informace o systému a nápověda",
+      "queries": [
+        {
+          "text": "Jak systém funguje?",
+          "icon": "❓",
+          "tags": ["nápověda", "systém", "info"],
+          "expectedType": "system",
+          "action": "help"
+        },
+        {
+          "text": "Jakou verzi používám?",
+          "icon": "ℹ️",
+          "tags": ["verze", "systém", "info"],
+          "expectedType": "system",
+          "action": "version"
+        },
+        {
+          "text": "Zobraz statistiky systému",
+          "icon": "📊",
+          "tags": ["statistika", "systém", "info"],
+          "expectedType": "system",
+          "action": "stats"
+        }
+      ]
+    }
+  },
+  "settings": {
+    "randomSelection": true,
+    "maxQueriesToShow": 6,
+    "refreshOnStartup": true,
+    "showOnlyBasic": false,
+    "rotationInterval": 0,
+    "priorityCategories": ["counting", "listing", "searching"],
+    "excludeAdvanced": true
+  },
+  "customization": {
+    "allowUserQueries": true,
+    "saveUserQueries": true,
+    "maxSavedQueries": 20,
+    "suggestSimilar": true
+  },
+  "localization": {
+    "welcomeTitle": "Co vás zajímá?",
+    "welcomeSubtitle": "Zkuste některý z těchto příkladů:",
+    "orTypeYourOwn": "Nebo napište vlastní dotaz...",
+    "showMore": "Zobrazit další příklady",
+    "showLess": "Zobrazit méně příkladů"
+  }
+}
