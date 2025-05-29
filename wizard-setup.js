@@ -10,7 +10,6 @@ import { providerRegistry } from './provider-registry.js';
 
 export class SetupWizard {
     constructor() {
-        super();
         this.currentStep = 0;
         this.steps = [
             'welcome',
