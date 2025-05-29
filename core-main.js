@@ -85,33 +85,33 @@ class Application {
         const aiProviders = providerRegistry.getProviders('ai');
         let hasAIConfig = false;
         
-for (const provider of aiProviders) {
-    try {
-        const instance = await providerRegistry.getInstance('ai', provider);
-        if (await instance.isConfigured()) {
-            hasAIConfig = true;
-            break;
+        for (const provider of aiProviders) {
+            try {
+                const instance = await providerRegistry.getInstance('ai', provider);
+                if (await instance.isConfigured()) {
+                    hasAIConfig = true;
+                    break;
+                }
+            } catch (error) {
+                console.log(`Skipping AI provider ${provider}: ${error.message}`);
+            }
         }
-    } catch (error) {
-        console.log(`Skipping AI provider ${provider}: ${error.message}`);
-    }
-}
         
-// Check for at least one CRM provider
-const crmProviders = providerRegistry.getProviders('crm');
-let hasCRMConfig = false;
+        // Check for at least one CRM provider
+        const crmProviders = providerRegistry.getProviders('crm');
+        let hasCRMConfig = false;
 
-for (const provider of crmProviders) {
-    try {
-        const instance = await providerRegistry.getInstance('crm', provider);
-        if (await instance.isConfigured()) {
-            hasCRMConfig = true;
-            break;
+        for (const provider of crmProviders) {
+            try {
+                const instance = await providerRegistry.getInstance('crm', provider);
+                if (await instance.isConfigured()) {
+                    hasCRMConfig = true;
+                    break;
+                }
+            } catch (error) {
+                console.log(`Skipping CRM provider ${provider}: ${error.message}`);
+            }
         }
-    } catch (error) {
-        console.log(`Skipping CRM provider ${provider}: ${error.message}`);
-    }
-}
         
         return hasAIConfig && hasCRMConfig;
     }
@@ -125,10 +125,10 @@ for (const provider of crmProviders) {
         this.setupWizard = new SetupWizard();
         await this.setupWizard.start();
         
-    // Listen for wizard completion
-    EventBus.on('wizard-complete', async () => {
-    await this.startApplication();
-    });
+        // Listen for wizard completion
+        EventBus.on('wizard-complete', async () => {
+            await this.startApplication();
+        });
     }
 
     /**
@@ -189,35 +189,21 @@ for (const provider of crmProviders) {
      * Setup message handling
      */
     setupMessageHandling() {
-        // Handle send button click
-        const sendButton = document.getElementById('send-button');
-        if (sendButton) {
-            sendButton.addEventListener('click', () => this.handleSendMessage());
-        }
-        
-        // Handle enter key in input
-        const chatInput = document.getElementById('chat-input');
-        if (chatInput) {
-            chatInput.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                    event.preventDefault();
-                    this.handleSendMessage();
-                }
-            });
-        }
+        // Listen for send message event from UI
+        EventBus.on('send-message', async (data) => {
+            await this.handleSendMessage(data.message);
+        });
     }
 
     /**
      * Handle sending a message
+     * @param {string} message - Message to send
      */
-    async handleSendMessage() {
-        const chatInput = document.getElementById('chat-input');
-        const message = chatInput.value.trim();
-        
-        if (!message) return;
+    async handleSendMessage(message) {
+        if (!message || !message.trim()) return;
         
         // Clear input and show user message
-        chatInput.value = '';
+        this.uiManager.clearInput();
         this.uiManager.addMessage('user', message);
         
         try {
@@ -379,6 +365,49 @@ for (const provider of crmProviders) {
             dataStats: this.getDataStatistics(),
             theme: this.uiManager?.getCurrentTheme()
         };
+    }
+
+    /**
+     * Show settings
+     */
+    showSettings() {
+        // TODO: Implement settings panel
+        this.uiManager.showModal('Nastavení', '<p>Nastavení bude brzy k dispozici.</p>', {
+            buttons: [{
+                text: 'Zavřít',
+                action: 'close',
+                class: 'primary'
+            }]
+        });
+    }
+
+    /**
+     * Show diagnostics
+     */
+    showDiagnostics() {
+        const state = this.exportState();
+        const content = `
+            <h4>Systémové informace</h4>
+            <ul>
+                <li><strong>Verze:</strong> ${state.version}</li>
+                <li><strong>AI providery:</strong> ${state.providers.ai.join(', ')}</li>
+                <li><strong>CRM providery:</strong> ${state.providers.crm.join(', ')}</li>
+                <li><strong>Téma:</strong> ${state.theme || 'claude'}</li>
+            </ul>
+            
+            <h4>Statistiky dat</h4>
+            <ul>
+                <li><strong>Celkem záznamů:</strong> ${state.dataStats?.total || 0}</li>
+            </ul>
+        `;
+        
+        this.uiManager.showModal('Diagnostika', content, {
+            buttons: [{
+                text: 'Zavřít',
+                action: 'close',
+                class: 'primary'
+            }]
+        });
     }
 }
 
