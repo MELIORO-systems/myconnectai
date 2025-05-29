@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="theme-google.css">
     <link rel="stylesheet" href="theme-replit.css">
     <link rel="stylesheet" href="wizard-setup.css">
+    <link rel="stylesheet" href="ui-base-manager.css">
     
     <!-- Preconnect to external domains -->
     <link rel="preconnect" href="https://api.openai.com">
@@ -50,23 +51,18 @@
                     </button>
                     <div class="dropdown-content" id="main-menu">
                         <button class="dropdown-item" onclick="MyConnectAI.app.uiManager.showHelp('general')">
-                            <span class="dropdown-icon">❓</span>
                             Jak systém funguje
                         </button>
                         <button class="dropdown-item" onclick="MyConnectAI.app.uiManager.showDataProtection()">
-                            <span class="dropdown-icon">🔒</span>
                             Ochrana dat
                         </button>
                         <button class="dropdown-item" onclick="MyConnectAI.app.reload()">
-                            <span class="dropdown-icon">🔄</span>
                             Obnovit data
                         </button>
                         <button class="dropdown-item" onclick="MyConnectAI.app.showDiagnostics()">
-                            <span class="dropdown-icon">🔧</span>
                             Diagnostika
                         </button>
                         <button class="dropdown-item" onclick="MyConnectAI.app.showSettings()">
-                            <span class="dropdown-icon">⚙️</span>
                             Nastavení
                         </button>
                     </div>
