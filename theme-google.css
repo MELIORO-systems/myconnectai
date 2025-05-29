@@ -1,0 +1,131 @@
+/**
+ * Google Theme - My Connect AI v2.0
+ * Material Design inspired theme
+ */
+
+.theme-google {
+    /* Primary Colors */
+    --color-primary: #1a73e8;
+    --color-primary-hover: #1557b0;
+    --color-secondary: #5f6368;
+    --color-success: #137333;
+    --color-warning: #f29900;
+    --color-error: #d93025;
+    --color-info: #1a73e8;
+    
+    /* Backgrounds */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #f1f3f4;
+    
+    /* Borders */
+    --border-color: #dadce0;
+    --border-radius: 0.5rem;
+    --border-radius-lg: 0.75rem;
+    
+    /* Text */
+    --text-primary: #202124;
+    --text-secondary: #5f6368;
+    --text-muted: #80868b;
+    
+    /* Shadows - Material Design elevation */
+    --shadow-sm: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+    --shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+    --shadow-lg: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 8px 12px 3px rgba(60, 64, 67, 0.15);
+    
+    /* Typography - Google Sans where available */
+    --font-family: 'Google Sans', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Google-specific adjustments */
+.theme-google .chat-header {
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3);
+}
+
+.theme-google .header-button {
+    font-weight: 500;
+    letter-spacing: 0.01785714em;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+}
+
+.theme-google .message {
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3);
+}
+
+.theme-google .modal {
+    box-shadow: 0 11px 15px -7px rgba(0, 0, 0, 0.2), 0 24px 38px 3px rgba(0, 0, 0, 0.14), 0 9px 46px 8px rgba(0, 0, 0, 0.12);
+}
+
+.theme-google .dropdown-content {
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Google Material ripple effect on buttons */
+.theme-google button {
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-google button::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.theme-google button:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Google-style focus indicators */
+.theme-google :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Input fields - Material Design style */
+.theme-google input,
+.theme-google textarea,
+.theme-google select {
+    border-bottom-width: 2px;
+    border-radius: 4px 4px 0 0;
+    background-color: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.42);
+    padding-top: 1.25rem;
+}
+
+.theme-google input:hover,
+.theme-google textarea:hover,
+.theme-google select:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+.theme-google input:focus,
+.theme-google textarea:focus,
+.theme-google select:focus {
+    background-color: rgba(0, 0, 0, 0.04);
+    border-color: var(--color-primary);
+}
+
+/* Floating labels effect (optional enhancement) */
+.theme-google .form-group {
+    position: relative;
+}
+
+.theme-google .form-group label {
+    transition: all 0.2s ease;
+}
+
+/* Selection color */
+.theme-google ::selection {
+    background: rgba(26, 115, 232, 0.3);
+    color: var(--text-primary);
+}
