@@ -879,12 +879,6 @@ export class UIManager extends EventEmitter {
     }
 }
 
-// Create EventEmitter base class if not exists
-export class EventEmitter {
-    constructor() {
-        this.events = {};
-    }
-
     on(event, listener) {
         if (!this.events[event]) {
             this.events[event] = [];
